@@ -1,19 +1,30 @@
 pipeline {
   agent any
   stages {
-    stage('Install Requirements') {
+    stage('Setup Python Env') {
       steps {
-        sh 'pip install -r requirements.txt'
+        sh '''
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        '''
       }
     }
     stage('Run Python Tests') {
       steps {
-        sh 'pytest tests/'
+        sh '''
+          . venv/bin/activate
+          pytest tests/
+        '''
       }
     }
     stage('Deploy with Ansible') {
       steps {
-        sh 'ansible-playbook playbook.yml'
+        sh '''
+          . venv/bin/activate
+          ansible-playbook playbook.yml
+        '''
       }
     }
   }
